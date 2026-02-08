@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/ui/header'
 import { Card, CardContent } from '@/components/ui/card'
-import { MapView } from '@/components/features/map-view'
+import { MapViewWrapper } from '@/components/features/MapViewWrapper'
+
 
 export default async function QuartiersPage() {
   // Récupérer les quartiers avec le nombre de biens
@@ -37,9 +38,9 @@ export default async function QuartiersPage() {
               Yaoundé • {quartiers.length} quartiers disponibles
             </p>
           </div>
-          <div className="mb-12">
-            <MapView biens={biens} />
-          </div>
+          <div className="w-full relative z-10">
+        <MapViewWrapper biens={biens} />
+      </div>
           {/* Grille de quartiers */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {quartiers.map((quartier) => (

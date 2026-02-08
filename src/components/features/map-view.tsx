@@ -1,3 +1,4 @@
+// src/components/features/map-view.tsx
 'use client'
 
 import { useEffect, useRef } from 'react'
@@ -9,6 +10,7 @@ interface Bien {
   latitude: number
   longitude: number
   titre: string
+  prix?: number
 }
 
 export function MapView({ biens }: { biens: Bien[] }) {
@@ -16,7 +18,7 @@ export function MapView({ biens }: { biens: Bien[] }) {
   const map = useRef<L.Map | null>(null)
 
   useEffect(() => {
-    if (!mapContainer.current) return
+    if (!mapContainer.current || !biens.length) return
 
     // Initialiser la carte
     if (!map.current) {
@@ -27,6 +29,18 @@ export function MapView({ biens }: { biens: Bien[] }) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
       }).addTo(map.current)
+
+      // ✅ FIX: Définir l'icône par défaut avec URLs CDN
+      const DefaultIcon = L.icon({
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41],
+      })
+
+      L.Marker.prototype.setIcon(DefaultIcon)
     }
 
     // Nettoyer les anciens markers
@@ -39,8 +53,13 @@ export function MapView({ biens }: { biens: Bien[] }) {
 
       // Ajouter les nouveaux markers
       biens.forEach((bien) => {
+        const popupContent = `
+          <div class="text-sm font-semibold">${bien.titre}</div>
+          ${bien.prix ? `<div class="text-xs text-gray-600">${bien.prix.toLocaleString()} FCFA</div>` : ''}
+        `
+
         L.marker([bien.latitude, bien.longitude])
-          .bindPopup(bien.titre)
+          .bindPopup(popupContent)
           .addTo(map.current!)
       })
     }
@@ -54,6 +73,7 @@ export function MapView({ biens }: { biens: Bien[] }) {
         height: '500px',
         borderRadius: '16px',
         overflow: 'hidden',
+        zIndex: 1,
       }}
     />
   )
