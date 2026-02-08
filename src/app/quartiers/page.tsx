@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { Header } from '@/components/ui/header'
-import { Card, CardContent } from '@/components/ui/card'
+import { Header } from '@/components/ui/Header'
+import { Card, CardContent } from '@/components/ui/Card'
 import { MapViewWrapper } from '@/components/features/MapViewWrapper'
 
 

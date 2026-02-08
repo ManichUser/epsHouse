@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { Header } from '@/components/ui/header'
-import { Card, CardImage, CardContent } from '@/components/ui/card'
+import { Header } from '@/components/ui/Header'
+import { Card, CardImage, CardContent } from '@/components/ui/Card'
 
 interface PageProps {
   params: Promise<{ quartierId: string }>

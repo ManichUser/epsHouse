@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { Header } from '@/components/ui/header'
-import { Button } from '@/components/ui/button'
+import { Header } from '@/components/ui/Header'
+import { Button } from '@/components/ui/Button'
 import { ImageGallery } from '@/components/features/image-gallery'
 
 interface PageProps {
