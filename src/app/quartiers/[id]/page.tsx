@@ -87,85 +87,90 @@ export default async function QuartierBiensPage({ params }: PageProps) {
                 const coverImage = bien.images.find(img => img.isCover) || bien.images[0]
                 
                 return (
-                  <Card key={bien.id}>
-                    {/* Image */}
-                    {coverImage && (
-                      <div className="relative">
-                        <CardImage 
-                          src={coverImage.url} 
-                          alt={bien.titre}
-                          className="h-64"
-                        />
-                        {/* Badge type en overlay */}
-                        <div className="absolute top-4 left-4">
-                          <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-gray-900 text-sm font-semibold rounded-full shadow-lg">
-                            {translateType(bien.type)}
-                          </span>
+                  <Link 
+                    key={bien.id} 
+                    href={`/quartiers/${quartier.id}/biens/${bien.id}`}
+                  >
+                    <Card>
+                      {/* Image */}
+                      {coverImage && (
+                        <div className="relative">
+                          <CardImage 
+                            src={coverImage.url} 
+                            alt={bien.titre}
+                            className="h-64"
+                          />
+                          {/* Badge type en overlay */}
+                          <div className="absolute top-4 left-4">
+                            <span className="px-4 py-2 bg-white/95 backdrop-blur-sm text-gray-900 text-sm font-semibold rounded-full shadow-lg">
+                              {translateType(bien.type)}
+                            </span>
+                          </div>
+                          {/* Icône favori */}
+                          <div className="absolute top-4 right-4">
+                            <button className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors">
+                              <svg
+                                className="w-5 h-5 text-gray-600"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                              </svg>
+                            </button>
+                          </div>
                         </div>
-                        {/* Icône favori */}
-                        <div className="absolute top-4 right-4">
-                          <button className="w-10 h-10 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-colors">
-                            <svg
-                              className="w-5 h-5 text-gray-600"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <CardContent className="p-5">
-                      {/* Titre */}
-                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
-                        {bien.titre}
-                      </h3>
+                      )}
                       
-                      {/* Localisation */}
-                      <div className="flex items-center gap-1 text-gray-500 text-sm mb-3">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                          <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        {quartier.nom}, Yaoundé
-                      </div>
-                      
-                      {/* Prix */}
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-2xl font-bold text-[#5B8DD6]">
-                            {formatPrice(bien.prix)}
-                          </p>
-                          <p className="text-xs text-gray-400">par mois</p>
+                      <CardContent className="p-5">
+                        {/* Titre */}
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                          {bien.titre}
+                        </h3>
+                        
+                        {/* Localisation */}
+                        <div className="flex items-center gap-1 text-gray-500 text-sm mb-3">
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                          </svg>
+                          {quartier.nom}, Yaoundé
                         </div>
                         
-                        {/* Note (placeholder) */}
-                        <div className="flex items-center gap-1">
-                          <svg
-                            className="w-5 h-5 text-yellow-400 fill-current"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                          </svg>
-                          <span className="text-sm font-semibold text-gray-700">4.8</span>
+                        {/* Prix */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-2xl font-bold text-[#5B8DD6]">
+                              {formatPrice(bien.prix)}
+                            </p>
+                            <p className="text-xs text-gray-400">par mois</p>
+                          </div>
+                          
+                          {/* Note (placeholder) */}
+                          <div className="flex items-center gap-1">
+                            <svg
+                              className="w-5 h-5 text-yellow-400 fill-current"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
+                            <span className="text-sm font-semibold text-gray-700">4.8</span>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 )
               })}
             </div>
