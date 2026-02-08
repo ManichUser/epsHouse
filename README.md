@@ -61,8 +61,4 @@ logement-mvp/
 - **Fonctions/variables**: camelCase
 - **Types**: PascalCase avec suffix
 
-## 📝 Statut
-
-✅ ÉTAPE 0 — Installation & Configuration (TERMINÉE)
-⏳ ÉTAPE 1 — En attente
 # epsHouse

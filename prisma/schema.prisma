@@ -1,0 +1,102 @@
+// Schéma Prisma pour Epsilon House
+// Base de données: SQLite (local, démo)
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// MODÈLE VILLE
+// ========================================
+model Ville {
+  id        String     @id @default(cuid())
+  nom       String     @unique
+  quartiers Quartier[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("villes")
+}
+
+// ========================================
+// MODÈLE QUARTIER
+// ========================================
+model Quartier {
+  id              String           @id @default(cuid())
+  nom             String
+  villeId         String
+  ville           Ville            @relation(fields: [villeId], references: [id], onDelete: Cascade)
+  zones           Zone[]
+  bienImmobiliers BienImmobilier[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([nom, villeId])
+  @@map("quartiers")
+}
+
+// ========================================
+// MODÈLE ZONE (optionnel)
+// ========================================
+model Zone {
+  id              String           @id @default(cuid())
+  nom             String
+  quartierId      String
+  quartier        Quartier         @relation(fields: [quartierId], references: [id], onDelete: Cascade)
+  bienImmobiliers BienImmobilier[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([nom, quartierId])
+  @@map("zones")
+}
+
+// ========================================
+// MODÈLE BIEN IMMOBILIER
+// ========================================
+model BienImmobilier {
+  id          String      @id @default(cuid())
+  titre       String
+  type        TypeBien
+  prix        Int // Prix en FCFA
+  description String
+  quartierId  String
+  quartier    Quartier    @relation(fields: [quartierId], references: [id], onDelete: Cascade)
+  zoneId      String?
+  zone        Zone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  images      ImageBien[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("bien_immobiliers")
+}
+
+// ========================================
+// MODÈLE IMAGE BIEN
+// ========================================
+model ImageBien {
+  id      String         @id @default(cuid())
+  url     String // URL Cloudinary
+  publicId String        // Public ID Cloudinary
+  isCover Boolean        @default(false) // Image principale
+  bienId  String
+  bien    BienImmobilier @relation(fields: [bienId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@map("images_bien")
+}
+
+// ========================================
+// ENUM TYPE DE BIEN
+// ========================================
+enum TypeBien {
+  CHAMBRE
+  STUDIO
+  APPARTEMENT
+}
