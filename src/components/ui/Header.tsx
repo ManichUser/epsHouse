@@ -12,7 +12,7 @@ export function Header() {
       <header className="fixed top-0 left-0 right-0 z-40 bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold text-[#5B8DD6]">Epsilon House</div>
+            <div className="text-2xl font-bold text-[#0755ca]">Epsilon House</div>
           </Link>
 
           <button
