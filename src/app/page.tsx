@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Header } from '@/components/ui/header'
+import Link from 'next/link'
 
 export default function HomePage() {
   const router = useRouter()
@@ -80,12 +81,12 @@ export default function HomePage() {
             
             {/* Sera rempli avec les biens depuis l'API */}
             <div className="text-center">
-              <a 
+              <Link 
                 href="/quartiers"
                 className="inline-block bg-[#5B8DD6] hover:bg-[#4a7bc5] text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors"
               >
                 Voir tous les logements
-              </a>
+              </Link>
             </div>
           </div>
         </section>

@@ -3,13 +3,13 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 
 export default function SearchSection() {
-  const [searchTerm, setSearchTerm] = useState('')
+//   const [searchTerm, setSearchTerm] = useState('')
   const [selectedQuartier, setSelectedQuartier] = useState('')
 
   const quartiers = ['Bastos', 'Ngoa-Ekellé', 'Mvan', 'Essos', 'Odza', 'Emana']
 
   return (
-    <section className="relative w-full mt-[42rem] px-4 py-12 bg-white">
+    <section className="relative w-full mt-168 px-4 py-12 bg-white">
       <div className="container mx-auto max-w-6xl">
         <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
           Recherchez votre logement

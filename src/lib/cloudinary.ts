@@ -20,24 +20,35 @@ export interface CloudinaryUploadResult {
   resource_type: string
 }
 
-// Fonction d'upload (sera utilisée dans les API routes)
+// ✅ FIX: Fonction d'upload avec conversion Buffer → Data URI
 export async function uploadToCloudinary(
   file: string | Buffer,
   folder: string = 'logements'
 ): Promise<CloudinaryUploadResult> {
   try {
-    const result = await cloudinary.uploader.upload(file, {
+    // ✅ Convertir Buffer en data URI si nécessaire
+    let uploadFile: string
+
+    if (Buffer.isBuffer(file)) {
+      const base64 = file.toString('base64')
+      // Utiliser jpeg par défaut (adapter selon tes besoins)
+      uploadFile = `data:image/jpeg;base64,${base64}`
+    } else {
+      uploadFile = file
+    }
+
+    const result = await cloudinary.uploader.upload(uploadFile, {
       folder,
       resource_type: 'auto',
     })
-    
+
     return {
       public_id: result.public_id,
       secure_url: result.secure_url,
-      width: result.width,
-      height: result.height,
-      format: result.format,
-      resource_type: result.resource_type,
+      width: result.width || 0,
+      height: result.height || 0,
+      format: result.format || '',
+      resource_type: result.resource_type || 'image',
     }
   } catch (error) {
     console.error('Cloudinary upload error:', error)
