@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
-interface Image {
+interface ImageType {
   id: string
   url: string
   publicId: string
@@ -10,7 +11,7 @@ interface Image {
 }
 
 interface ImageGalleryProps {
-  images: Image[]
+  images: ImageType[]
   title: string
 }
 
@@ -44,10 +45,12 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
     <div className="space-y-4">
       {/* Image principale */}
       <div className="relative w-full h-96 md:h-[500px] bg-gray-100 rounded-2xl overflow-hidden group">
-        <img
+        <Image
           src={currentImage.url}
           alt={`${title} - Image ${selectedIndex + 1}`}
-          className="w-full h-full object-cover"
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
         />
         
         {/* Navigation gauche/droite */}
@@ -110,10 +113,12 @@ export function ImageGallery({ images, title }: ImageGalleryProps) {
                   : 'opacity-60 hover:opacity-100'
               }`}
             >
-              <img
+              <Image
                 src={image.url}
                 alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 15vw"
               />
             </button>
           ))}

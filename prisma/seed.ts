@@ -1,293 +1,322 @@
 import { PrismaClient, TypeBien } from '@prisma/client'
 
-
 const prisma = new PrismaClient()
 
+// Coordonnées GPS réelles de Yaoundé et ses quartiers
+const YAOUNDE_COORDS = { lat: 3.848, lng: 11.5021 }
+
+const QUARTIERS_COORDS = {
+  'Ngoa-Ekellé': { lat: 3.8656, lng: 11.5244 },
+  'Bastos': { lat: 3.8753, lng: 11.4983 },
+  'Mvan': { lat: 3.8405, lng: 11.4893 },
+  'Essos': { lat: 3.8625, lng: 11.5156 },
+  'Odza': { lat: 3.8234, lng: 11.5467 },
+  'Emana': { lat: 3.8012, lng: 11.4756 },
+}
+
 async function main() {
-  console.log('🌱 Début du seed...')
+  console.log('🌱 Début du seed avec GPS...')
 
-  // Nettoyer la base de données
-  await prisma.imageBien.deleteMany()
-  await prisma.bienImmobilier.deleteMany()
-  await prisma.zone.deleteMany()
-  await prisma.quartier.deleteMany()
-  await prisma.ville.deleteMany()
+  try {
+    // Nettoyer la base de données
+    console.log('🗑️  Nettoyage des données existantes...')
+    await prisma.imageBien.deleteMany().catch(() => {})
+    await prisma.bienImmobilier.deleteMany().catch(() => {})
+    await prisma.zone.deleteMany().catch(() => {})
+    await prisma.quartier.deleteMany().catch(() => {})
+    await prisma.ville.deleteMany().catch(() => {})
 
-  console.log('✅ Base de données nettoyée')
+    console.log('✅ Base de données nettoyée')
 
-  // ========================================
-  // 1. CRÉER LA VILLE : YAOUNDÉ
-  // ========================================
-  const yaounde = await prisma.ville.create({
-    data: {
-      nom: 'Yaoundé',
-    },
-  })
-  console.log('✅ Ville créée: Yaoundé')
-
-  // ========================================
-  // 2. CRÉER LES QUARTIERS DE YAOUNDÉ
-  // ========================================
-  const quartiers = await Promise.all([
-    prisma.quartier.create({
+    // CRÉER LA VILLE : YAOUNDÉ
+    const yaounde = await prisma.ville.create({
       data: {
-        nom: 'Ngoa-Ekellé',
-        villeId: yaounde.id,
+        nom: 'Yaoundé',
+        latitude: YAOUNDE_COORDS.lat,
+        longitude: YAOUNDE_COORDS.lng,
       },
-    }),
-    prisma.quartier.create({
-      data: {
-        nom: 'Bastos',
-        villeId: yaounde.id,
-      },
-    }),
-    prisma.quartier.create({
-      data: {
-        nom: 'Mvan',
-        villeId: yaounde.id,
-      },
-    }),
-    prisma.quartier.create({
-      data: {
-        nom: 'Essos',
-        villeId: yaounde.id,
-      },
-    }),
-    prisma.quartier.create({
-      data: {
-        nom: 'Odza',
-        villeId: yaounde.id,
-      },
-    }),
-    prisma.quartier.create({
-      data: {
-        nom: 'Emana',
-        villeId: yaounde.id,
-      },
-    }),
-  ])
-  console.log(`✅ ${quartiers.length} quartiers créés`)
+    })
+    console.log('✅ Ville créée: Yaoundé')
 
-  // ========================================
-  // 3. CRÉER DES ZONES (optionnel)
-  // ========================================
-  const zonesNgoaEkelle = await Promise.all([
-    prisma.zone.create({
-      data: {
-        nom: 'Carrefour Jouvence',
-        quartierId: quartiers[0].id,
-      },
-    }),
-    prisma.zone.create({
-      data: {
-        nom: 'Rond-point Nlongkak',
-        quartierId: quartiers[0].id,
-      },
-    }),
-  ])
-  console.log('✅ Zones créées pour Ngoa-Ekellé')
+    // CRÉER LES QUARTIERS
+    const quartiers = await Promise.all(
+      Object.entries(QUARTIERS_COORDS).map(([nom, coords]) =>
+        prisma.quartier.create({
+          data: {
+            nom,
+            villeId: yaounde.id,
+            latitude: coords.lat,
+            longitude: coords.lng,
+          },
+        })
+      )
+    )
+    console.log(`✅ ${quartiers.length} quartiers créés`)
 
-  // ========================================
-  // 4. CRÉER LES BIENS IMMOBILIERS
-  // ========================================
-  
-  // NGOA-EKELLÉ
-  const bien1 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Studio moderne proche Jouvence',
-      type: TypeBien.STUDIO,
-      prix: 75000,
-      description: 'Studio tout équipé, meublé avec cuisine américaine. Eau et électricité disponibles 24h/24. Quartier calme et sécurisé.',
-      quartierId: quartiers[0].id,
-      zoneId: zonesNgoaEkelle[0].id,
-    },
-  })
-
-  const bien2 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Chambre spacieuse Nlongkak',
-      type: TypeBien.CHAMBRE,
-      prix: 40000,
-      description: 'Chambre dans une villa partagée, salle de bain commune. Proche des transports, marché à proximité.',
-      quartierId: quartiers[0].id,
-      zoneId: zonesNgoaEkelle[1].id,
-    },
-  })
-
-  const bien3 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Appartement 2 chambres Ngoa-Ekellé',
-      type: TypeBien.APPARTEMENT,
-      prix: 150000,
-      description: 'Bel appartement de 2 chambres avec salon, cuisine équipée. Immeuble moderne avec parking. Idéal pour famille.',
-      quartierId: quartiers[0].id,
-    },
-  })
-
-  // BASTOS
-  const bien4 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Appartement standing Bastos',
-      type: TypeBien.APPARTEMENT,
-      prix: 350000,
-      description: 'Appartement haut standing 3 chambres, climatisation, eau chaude, internet fibre. Résidence sécurisée avec gardien.',
-      quartierId: quartiers[1].id,
-    },
-  })
-
-  const bien5 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Studio luxueux Bastos',
-      type: TypeBien.STUDIO,
-      prix: 180000,
-      description: 'Studio luxueux meublé, quartier diplomatique. Proche ambassades et restaurants. Parking privé inclus.',
-      quartierId: quartiers[1].id,
-    },
-  })
-
-  // MVAN
-  const bien6 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Chambre étudiante Mvan',
-      type: TypeBien.CHAMBRE,
-      prix: 35000,
-      description: 'Chambre simple pour étudiant, proche de l\'université. Environnement calme pour études.',
-      quartierId: quartiers[2].id,
-    },
-  })
-
-  const bien7 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Appartement 3 chambres Mvan',
-      type: TypeBien.APPARTEMENT,
-      prix: 120000,
-      description: 'Grand appartement familial, 3 chambres, 2 salles de bain. Balcon avec vue dégagée. Quartier animé.',
-      quartierId: quartiers[2].id,
-    },
-  })
-
-  // ESSOS
-  const bien8 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Studio neuf Essos',
-      type: TypeBien.STUDIO,
-      prix: 60000,
-      description: 'Studio récemment rénové, carrelage neuf. Cuisine équipée, toilette interne. Proche du marché central.',
-      quartierId: quartiers[3].id,
-    },
-  })
-
-  const bien9 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Chambre indépendante Essos',
-      type: TypeBien.CHAMBRE,
-      prix: 45000,
-      description: 'Chambre avec entrée indépendante, douche interne. Idéal pour jeune professionnel. Accès moto-taxi facile.',
-      quartierId: quartiers[3].id,
-    },
-  })
-
-  const bien10 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Appartement 2 chambres Essos',
-      type: TypeBien.APPARTEMENT,
-      prix: 100000,
-      description: 'Appartement lumineux, 2 chambres avec placards. Salon spacieux, cuisine avec coin repas. Eau CAMWATER.',
-      quartierId: quartiers[3].id,
-    },
-  })
-
-  // ODZA
-  const bien11 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Chambre simple Odza',
-      type: TypeBien.CHAMBRE,
-      prix: 30000,
-      description: 'Chambre économique, propre et sécurisée. Parfait pour budget serré. Quartier populaire bien desservi.',
-      quartierId: quartiers[4].id,
-    },
-  })
-
-  const bien12 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Studio tout équipé Odza',
-      type: TypeBien.STUDIO,
-      prix: 55000,
-      description: 'Studio compact avec tout le confort: lit, armoire, table. Eau et électricité stables. Proche des commerces.',
-      quartierId: quartiers[4].id,
-    },
-  })
-
-  // EMANA
-  const bien13 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Appartement 4 chambres Emana',
-      type: TypeBien.APPARTEMENT,
-      prix: 200000,
-      description: 'Grande villa transformée en appartement, 4 chambres. Jardin privatif, parking multiple. Idéal grande famille.',
-      quartierId: quartiers[5].id,
-    },
-  })
-
-  const bien14 = await prisma.bienImmobilier.create({
-    data: {
-      titre: 'Chambre avec balcon Emana',
-      type: TypeBien.CHAMBRE,
-      prix: 38000,
-      description: 'Chambre spacieuse avec petit balcon, vue sur verdure. Calme et aéré. Parfait pour repos.',
-      quartierId: quartiers[5].id,
-    },
-  })
-
-  const biens = [bien1, bien2, bien3, bien4, bien5, bien6, bien7, bien8, bien9, bien10, bien11, bien12, bien13, bien14]
-  console.log(`✅ ${biens.length} biens immobiliers créés`)
-
-  // ========================================
-  // 5. AJOUTER DES IMAGES (PLACEHOLDER)
-  // ========================================
-  // Note: Ces URLs seront remplacées par de vraies images Cloudinary
-  const placeholderImages = [
-    'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
-    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
-    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
-    'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800',
-    'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800',
-  ]
-
-  for (const bien of biens) {
-    // Ajouter 2-4 images par bien
-    const numImages = Math.floor(Math.random() * 3) + 2
-    for (let i = 0; i < numImages; i++) {
-      const imageUrl = placeholderImages[Math.floor(Math.random() * placeholderImages.length)]
-      await prisma.imageBien.create({
+    // CRÉER DES ZONES pour Ngoa-Ekellé
+    const zonesNgoaEkelle = await Promise.all([
+      prisma.zone.create({
         data: {
-          url: imageUrl,
-          publicId: `placeholder_${bien.id}_${i}`,
-          isCover: i === 0, // Première image = cover
-          bienId: bien.id,
+          nom: 'Carrefour Jouvence',
+          quartierId: quartiers[0].id,
+          latitude: 3.8670,
+          longitude: 11.5250,
+        },
+      }),
+      prisma.zone.create({
+        data: {
+          nom: 'Rond-point Nlongkak',
+          quartierId: quartiers[0].id,
+          latitude: 3.8642,
+          longitude: 11.5238,
+        },
+      }),
+    ])
+
+    // CRÉER LES BIENS avec positions GPS
+    const biens = []
+
+    // Helper pour générer position aléatoire autour d'un point
+    const randomOffset = () => (Math.random() - 0.5) * 0.01
+
+    // NGOA-EKELLÉ
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Studio moderne proche Jouvence',
+          type: TypeBien.STUDIO,
+          prix: 75000,
+          description:
+            'Studio tout équipé, meublé avec cuisine américaine. Eau et électricité 24h/24. Quartier calme et sécurisé.',
+          superficie: 25,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: true,
+          latitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lng + randomOffset(),
+          adresse: 'Avenue Jouvence, Ngoa-Ekellé, Yaoundé',
+          quartierId: quartiers[0].id,
+          zoneId: zonesNgoaEkelle[0].id,
+          disponible: true,
         },
       })
-    }
-  }
-  console.log('✅ Images placeholder créées')
+    )
 
-  console.log('🎉 Seed terminé avec succès!')
-  console.log(`
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Chambre spacieuse Nlongkak',
+          type: TypeBien.CHAMBRE,
+          prix: 40000,
+          description: 'Chambre dans villa partagée, salle de bain commune. Proche transports.',
+          superficie: 15,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: false,
+          latitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lng + randomOffset(),
+          adresse: 'Rond-point Nlongkak, Ngoa-Ekellé, Yaoundé',
+          quartierId: quartiers[0].id,
+          zoneId: zonesNgoaEkelle[1].id,
+          disponible: true,
+        },
+      })
+    )
+
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Appartement 2 chambres Ngoa-Ekellé',
+          type: TypeBien.APPARTEMENT,
+          prix: 150000,
+          description: 'Bel appartement avec salon, cuisine équipée. Immeuble moderne avec parking.',
+          superficie: 65,
+          nombreChambres: 2,
+          nombreSallesBain: 1,
+          meuble: false,
+          latitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Ngoa-Ekellé'].lng + randomOffset(),
+          adresse: 'Ngoa-Ekellé, Yaoundé',
+          quartierId: quartiers[0].id,
+          disponible: true,
+        },
+      })
+    )
+
+    // BASTOS
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Appartement standing Bastos',
+          type: TypeBien.APPARTEMENT,
+          prix: 350000,
+          description:
+            'Appartement haut standing 3 chambres, climatisation, eau chaude, internet fibre.',
+          superficie: 120,
+          nombreChambres: 3,
+          nombreSallesBain: 2,
+          meuble: true,
+          latitude: QUARTIERS_COORDS['Bastos'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Bastos'].lng + randomOffset(),
+          adresse: 'Avenue des Ambassades, Bastos, Yaoundé',
+          quartierId: quartiers[1].id,
+          disponible: true,
+        },
+      })
+    )
+
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Studio luxueux Bastos',
+          type: TypeBien.STUDIO,
+          prix: 180000,
+          description: 'Studio luxueux meublé, quartier diplomatique. Parking privé inclus.',
+          superficie: 35,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: true,
+          latitude: QUARTIERS_COORDS['Bastos'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Bastos'].lng + randomOffset(),
+          adresse: 'Bastos, Yaoundé',
+          quartierId: quartiers[1].id,
+          disponible: true,
+        },
+      })
+    )
+
+    // MVAN
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Chambre étudiante Mvan',
+          type: TypeBien.CHAMBRE,
+          prix: 35000,
+          description: "Chambre simple pour étudiant, proche de l'université.",
+          superficie: 12,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: true,
+          latitude: QUARTIERS_COORDS['Mvan'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Mvan'].lng + randomOffset(),
+          adresse: 'Mvan, Yaoundé',
+          quartierId: quartiers[2].id,
+          disponible: true,
+        },
+      })
+    )
+
+    // ESSOS
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Studio neuf Essos',
+          type: TypeBien.STUDIO,
+          prix: 60000,
+          description: 'Studio récemment rénové, carrelage neuf. Cuisine équipée.',
+          superficie: 28,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: false,
+          latitude: QUARTIERS_COORDS['Essos'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Essos'].lng + randomOffset(),
+          adresse: 'Essos, Yaoundé',
+          quartierId: quartiers[3].id,
+          disponible: true,
+        },
+      })
+    )
+
+    // ODZA
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Chambre simple Odza',
+          type: TypeBien.CHAMBRE,
+          prix: 30000,
+          description: 'Chambre économique, propre et sécurisée.',
+          superficie: 10,
+          nombreChambres: 1,
+          nombreSallesBain: 1,
+          meuble: false,
+          latitude: QUARTIERS_COORDS['Odza'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Odza'].lng + randomOffset(),
+          adresse: 'Odza, Yaoundé',
+          quartierId: quartiers[4].id,
+          disponible: true,
+        },
+      })
+    )
+
+    // EMANA
+    biens.push(
+      await prisma.bienImmobilier.create({
+        data: {
+          titre: 'Appartement 4 chambres Emana',
+          type: TypeBien.APPARTEMENT,
+          prix: 200000,
+          description: 'Grande villa transformée en appartement, 4 chambres. Jardin privatif.',
+          superficie: 150,
+          nombreChambres: 4,
+          nombreSallesBain: 2,
+          meuble: false,
+          latitude: QUARTIERS_COORDS['Emana'].lat + randomOffset(),
+          longitude: QUARTIERS_COORDS['Emana'].lng + randomOffset(),
+          adresse: 'Emana, Yaoundé',
+          quartierId: quartiers[5].id,
+          disponible: true,
+        },
+      })
+    )
+
+    console.log(`✅ ${biens.length} biens immobiliers créés`)
+
+    // AJOUTER DES IMAGES
+    const placeholderImages = [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800',
+      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800',
+      'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?w=800',
+    ]
+
+    for (const bien of biens) {
+      const numImages = Math.floor(Math.random() * 3) + 2
+      for (let i = 0; i < numImages; i++) {
+        const imageUrl = placeholderImages[Math.floor(Math.random() * placeholderImages.length)]
+        await prisma.imageBien.create({
+          data: {
+            url: imageUrl,
+            publicId: `placeholder_${bien.id}_${i}`,
+            isCover: i === 0,
+            ordre: i,
+            bienId: bien.id,
+          },
+        })
+      }
+    }
+
+    console.log('✅ Images placeholder créées')
+    console.log('🎉 Seed terminé avec succès!')
+    console.log(`
 📊 RÉSUMÉ:
-  - 1 Ville (Yaoundé)
-  - ${quartiers.length} Quartiers
-  - 2 Zones
-  - ${biens.length} Biens immobiliers
-  - ~${biens.length * 3} Images
-  `)
+  - 1 Ville (Yaoundé) avec GPS ✅
+  - ${quartiers.length} Quartiers avec GPS ✅
+  - 2 Zones avec GPS ✅
+  - ${biens.length} Biens immobiliers avec GPS ✅
+  - ~${biens.length * 3} Images ✅
+    `)
+  } catch (error) {
+    console.error('❌ Erreur lors du seed:', error)
+    throw error
+  } finally {
+    await prisma.$disconnect()
+  }
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
   .catch(async (e) => {
-    console.error('❌ Erreur lors du seed:', e)
+    console.error(e)
     await prisma.$disconnect()
     process.exit(1)
   })

@@ -17,6 +17,8 @@ datasource db {
 model Ville {
   id        String     @id @default(cuid())
   nom       String     @unique
+  latitude  Float      // Position GPS de la ville
+  longitude Float
   quartiers Quartier[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -31,6 +33,8 @@ model Quartier {
   id              String           @id @default(cuid())
   nom             String
   villeId         String
+  latitude        Float            // Position GPS du quartier
+  longitude       Float
   ville           Ville            @relation(fields: [villeId], references: [id], onDelete: Cascade)
   zones           Zone[]
   bienImmobiliers BienImmobilier[]
@@ -48,6 +52,8 @@ model Zone {
   id              String           @id @default(cuid())
   nom             String
   quartierId      String
+  latitude        Float            // Position GPS de la zone
+  longitude       Float
   quartier        Quartier         @relation(fields: [quartierId], references: [id], onDelete: Cascade)
   bienImmobiliers BienImmobilier[]
   createdAt       DateTime         @default(now())
@@ -61,18 +67,27 @@ model Zone {
 // MODÈLE BIEN IMMOBILIER
 // ========================================
 model BienImmobilier {
-  id          String      @id @default(cuid())
-  titre       String
-  type        TypeBien
-  prix        Int // Prix en FCFA
-  description String
-  quartierId  String
-  quartier    Quartier    @relation(fields: [quartierId], references: [id], onDelete: Cascade)
-  zoneId      String?
-  zone        Zone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
-  images      ImageBien[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id                 String      @id @default(cuid())
+  titre              String
+  type               TypeBien
+  prix               Int         // Prix en FCFA
+  description        String
+  superficie         Int?        // Superficie en m²
+  nombreChambres     Int?        // Nombre de chambres
+  nombreSallesBain   Int?        // Nombre de salles de bain
+  meuble             Boolean     @default(false) // Est meublé ?
+  latitude           Float       // Position GPS exacte du bien
+  longitude          Float
+  adresse            String      // Adresse complète
+  quartierId         String
+  quartier           Quartier    @relation(fields: [quartierId], references: [id], onDelete: Cascade)
+  zoneId             String?
+  zone               Zone?       @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  images             ImageBien[]
+  disponible         Boolean     @default(true) // Disponibilité
+  dateDisponibilite  DateTime?   // Date de disponibilité
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
 
   @@map("bien_immobiliers")
 }
@@ -81,13 +96,14 @@ model BienImmobilier {
 // MODÈLE IMAGE BIEN
 // ========================================
 model ImageBien {
-  id      String         @id @default(cuid())
-  url     String // URL Cloudinary
-  publicId String        // Public ID Cloudinary
-  isCover Boolean        @default(false) // Image principale
-  bienId  String
-  bien    BienImmobilier @relation(fields: [bienId], references: [id], onDelete: Cascade)
-  createdAt DateTime     @default(now())
+  id        String         @id @default(cuid())
+  url       String         // URL Cloudinary
+  publicId  String         // Public ID Cloudinary
+  isCover   Boolean        @default(false) // Image principale
+  ordre     Int            @default(0) // Ordre d'affichage
+  bienId    String
+  bien      BienImmobilier @relation(fields: [bienId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
 
   @@map("images_bien")
 }

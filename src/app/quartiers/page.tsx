@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { Header } from '@/components/ui/Header'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Header } from '@/components/ui/header'
+import { Card, CardContent } from '@/components/ui/card'
+import { MapView } from '@/components/features/map-view'
 
 export default async function QuartiersPage() {
   // Récupérer les quartiers avec le nombre de biens
@@ -15,7 +16,12 @@ export default async function QuartiersPage() {
       nom: 'asc',
     },
   })
-
+  const biens = await prisma.bienImmobilier.findMany({
+    include: {
+      images: { where: { isCover: true } },
+      quartier: true,
+    },
+  })
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -31,7 +37,9 @@ export default async function QuartiersPage() {
               Yaoundé • {quartiers.length} quartiers disponibles
             </p>
           </div>
-
+          <div className="mb-12">
+            <MapView biens={biens} />
+          </div>
           {/* Grille de quartiers */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {quartiers.map((quartier) => (
@@ -75,6 +83,7 @@ export default async function QuartiersPage() {
                         <path d="M9 5l7 7-7 7"></path>
                       </svg>
                     </div>
+                    
                   </CardContent>
                 </Card>
               </Link>

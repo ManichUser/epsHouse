@@ -1,19 +1,19 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { Header } from '@/components/ui/Header'
-import { Card, CardImage, CardContent } from '@/components/ui/Card'
+import { Header } from '@/components/ui/header'
+import { Card, CardImage, CardContent } from '@/components/ui/card'
 
 interface PageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ quartierId: string }>
 }
 
 export default async function QuartierBiensPage({ params }: PageProps) {
-  const { id } = await params
+  const { quartierId } = await params
   
   // Récupérer le quartier avec ses biens
   const quartier = await prisma.quartier.findUnique({
-    where: { id },
+    where: { id: quartierId },
     include: {
       bienImmobiliers: {
         include: {

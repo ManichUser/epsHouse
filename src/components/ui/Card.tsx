@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface CardProps {
   children: React.ReactNode
@@ -26,10 +27,12 @@ export function Card({ children, className, onClick, hover = true }: CardProps) 
 export function CardImage({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return (
     <div className={cn('relative w-full h-48 bg-gray-100', className)}>
-      <img
+      <Image
         src={src}
         alt={alt}
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
     </div>
   )
