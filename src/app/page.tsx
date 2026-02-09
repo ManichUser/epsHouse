@@ -39,7 +39,7 @@ export default function HomePage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Yaoundé, Bastos, Ngoa-Ekellé..."
-                    className="flex-1 px-8 py-5 text-lg outline-none text-gray-900"
+                    className="flex-1 px-8 py-5 z-10 text-lg outline-none text-gray-900"
                   />
                   <button
                     type="submit"
@@ -53,11 +53,11 @@ export default function HomePage() {
           </div>
 
           {/* Image decorative */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-50 to-transparent"></div>
+          <div className="absolute z-1 bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-50 to-transparent"></div>
         </section>
 
         {/* Section Image Hero */}
-        <section className="relative -mt-20">
+        <section className="relative z-10 -mt-20">
           <div className="container mx-auto px-4">
             <div className="relative h-96 md:h-125 rounded-3xl overflow-hidden shadow-2xl">
               <Image
